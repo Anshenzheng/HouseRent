@@ -16,7 +16,7 @@
 
       <ng-container *ngIf="currentUser">
         <a *ngIf="currentUser.role === 'LANDLORD'" routerLink="/my-houses" routerLinkActive="active" (click)="isMobileMenuOpen = false">我的房源</a>
-        <a *ngIf="currentUser.role === 'TENANT'" routerLink="/my-appointments" routerLinkActive="active" (click)="isMobileMenuOpen = false">我的预约</a>
+        <a *ngIf="currentUser" routerLink="/my-appointments" routerLinkActive="active" (click)="isMobileMenuOpen = false">我的预约</a>
         <a *ngIf="currentUser.role === 'TENANT'" routerLink="/my-favorites" routerLinkActive="active" (click)="isMobileMenuOpen = false">我的收藏</a>
       </ng-container>
 

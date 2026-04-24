@@ -20,6 +20,7 @@ export class HouseDetailComponent implements OnInit {
   success = '';
   showAppointmentModal = false;
   today: string = new Date().toISOString().split('T')[0];
+  currentImageIndex = 0;
 
   appointmentForm: FormGroup;
   appointmentLoading = false;
@@ -172,5 +173,17 @@ export class HouseDetailComponent implements OnInit {
       return [];
     }
     return this.house.facilities.split(',');
+  }
+
+  selectImage(index: number): void {
+    this.currentImageIndex = index;
+  }
+
+  isLandlordOfHouse(): boolean {
+    if (!this.authService.isLoggedIn() || !this.house) {
+      return false;
+    }
+    const currentUser = this.authService.currentUserValue;
+    return currentUser?.id === this.house.landlord.id;
   }
 }

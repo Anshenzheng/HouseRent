@@ -34,12 +34,14 @@
       <div class="house-main">
         <div class="image-gallery">
           <div class="main-image">
-            <img [src]="getHouseImages()[0]" alt="房源图片">
+            <img [src]="getHouseImages()[currentImageIndex]" alt="房源图片">
           </div>
           <div class="thumbnail-list" *ngIf="getHouseImages().length > 1">
             <div 
-              *ngFor="let img of getHouseImages().slice(1, 5)" 
-              class="thumbnail">
+              *ngFor="let img of getHouseImages(); let i = index" 
+              class="thumbnail"
+              [class.selected]="i === currentImageIndex"
+              (click)="selectImage(i)">
               <img [src]="img" alt="房源图片">
             </div>
           </div>
@@ -65,19 +67,22 @@
             </div>
           </div>
           <div class="action-buttons">
-            <button 
-              class="btn btn-favorite" 
-              [class.active]="isFavorite"
-              (click)="toggleFavorite()">
-              <span class="heart">{{ isFavorite ? '❤️' : '🤍' }}</span>
-              <span>{{ isFavorite ? '已收藏' : '收藏' }}</span>
-            </button>
-            <button 
-              class="btn btn-primary" 
-              (click)="openAppointmentModal()"
-              *ngIf="house.status === 'PUBLISHED'">
-              📅 预约看房
-            </button>
+            <ng-container *ngIf="!isLandlordOfHouse()">
+              <button 
+                class="btn btn-favorite" 
+                [class.active]="isFavorite"
+                (click)="toggleFavorite()">
+                <span class="heart">{{ isFavorite ? '❤️' : '🤍' }}</span>
+                <span>{{ isFavorite ? '已收藏' : '收藏' }}</span>
+              </button>
+              <button 
+                class="btn btn-primary" 
+                (click)="openAppointmentModal()"
+                *ngIf="house.status === 'PUBLISHED'">
+                📅 预约看房
+              </button>
+            </ng-container>
+            <span class="landlord-hint" *ngIf="isLandlordOfHouse()">这是您发布的房源</span>
           </div>
         </div>
 
