@@ -1,0 +1,118 @@
+<div class="house-list-page">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">找房子</h1>
+      <p class="page-subtitle">共找到 {{ houses.length }} 套房源</p>
+    </div>
+
+    <div class="filter-section card">
+      <div class="filter-row">
+        <div class="filter-item">
+          <label class="filter-label">关键词</label>
+          <input 
+            type="text" 
+            [(ngModel)]="filter.keyword" 
+            placeholder="搜索小区、地址..."
+            class="form-input">
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">城市</label>
+          <select [(ngModel)]="filter.city" class="form-select">
+            <option *ngFor="let city of cities" [value]="city">{{ city || '城市不限' }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-item">
+          <label class="filter-label">价格</label>
+          <div class="filter-options">
+            <button 
+              *ngFor="let range of priceRanges; let i = index"
+              class="filter-btn"
+              [class.active]="selectedPriceRange === i"
+              (click)="onPriceRangeChange(i)">
+              {{ range.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-item">
+          <label class="filter-label">户型</label>
+          <div class="filter-options">
+            <button 
+              *ngFor="let option of bedroomOptions"
+              class="filter-btn"
+              [class.active]="selectedBedroom === option.value"
+              (click)="onBedroomChange(option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-item">
+          <label class="filter-label">房屋类型</label>
+          <select [(ngModel)]="filter.houseType" class="form-select">
+            <option *ngFor="let type of houseTypes" [value]="type">{{ type || '类型不限' }}</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">装修</label>
+          <select [(ngModel)]="filter.decoration" class="form-select">
+            <option *ngFor="let deco of decorations" [value]="deco">{{ deco || '装修不限' }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-light" (click)="resetFilter()">重置</button>
+        <button class="btn btn-primary" (click)="searchHouses()">搜索</button>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <p>正在加载房源...</p>
+    </div>
+
+    <div *ngIf="!loading && houses.length === 0" class="empty-state">
+      <span class="empty-state-icon">🏠</span>
+      <p class="empty-state-text">暂无符合条件的房源</p>
+      <button class="btn btn-primary" (click)="resetFilter(); searchHouses()">查看全部房源</button>
+    </div>
+
+    <div *ngIf="!loading && houses.length > 0" class="houses-grid">
+      <div *ngFor="let house of houses" class="house-card card">
+        <div class="house-image" [routerLink]="['/houses', house.id]">
+          <img [src]="getHouseImage(house)" [alt]="house.title">
+          <span class="house-status badge" [ngClass]="{
+            'badge-success': house.status === 'PUBLISHED',
+            'badge-warning': house.status !== 'PUBLISHED'
+          }">
+            {{ house.status === 'PUBLISHED' ? '可租' : '已下架' }}
+          </span>
+        </div>
+        <div class="house-content">
+          <h3 class="house-title" [routerLink]="['/houses', house.id]">{{ house.title }}</h3>
+          <p class="house-location">📍 {{ house.city }} · {{ house.district }} · {{ house.address || '' }}</p>
+          <div class="house-info">
+            <span class="info-tag">{{ house.area }}㎡</span>
+            <span class="info-tag">{{ house.bedroom }}室{{ house.livingRoom || 0 }}厅{{ house.bathroom || 0 }}卫</span>
+            <span class="info-tag" *ngIf="house.orientation">{{ house.orientation }}</span>
+            <span class="info-tag" *ngIf="house.decoration">{{ house.decoration }}</span>
+          </div>
+          <div class="house-footer">
+            <div class="house-price">
+              <span class="price">¥{{ house.price }}</span>
+              <span class="unit">/月</span>
+            </div>
+            <button class="btn btn-outline btn-sm" [routerLink]="['/houses', house.id]">查看详情</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

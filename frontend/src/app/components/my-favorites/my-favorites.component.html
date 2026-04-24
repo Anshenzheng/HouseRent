@@ -1,0 +1,55 @@
+<div class="my-favorites-page">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">我的收藏</h1>
+      <p class="page-subtitle">共收藏 {{ favorites.length }} 套房源</p>
+    </div>
+
+    <div *ngIf="success" class="success-message">{{ success }}</div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <div *ngIf="loading" class="loading">
+      <p>加载中...</p>
+    </div>
+
+    <div *ngIf="!loading && favorites.length === 0" class="empty-state">
+      <span class="empty-state-icon">❤️</span>
+      <h3>还没有收藏房源</h3>
+      <p>浏览房源，收藏您感兴趣的房子吧</p>
+      <a routerLink="/houses" class="btn btn-primary">去浏览房源</a>
+    </div>
+
+    <div *ngIf="!loading && favorites.length > 0" class="favorites-grid">
+      <div *ngFor="let favorite of favorites" class="favorite-card card">
+        <div class="house-image" [routerLink]="['/houses', favorite.house.id]">
+          <img [src]="getHouseImage(favorite)" [alt]="favorite.house.title">
+          <button class="remove-favorite" (click)="toggleFavorite(favorite); $event.stopPropagation()">
+            ❤️
+          </button>
+        </div>
+        <div class="house-content">
+          <h3 class="house-title" [routerLink]="['/houses', favorite.house.id]">
+            {{ favorite.house.title }}
+          </h3>
+          <p class="house-location">📍 {{ favorite.house.city }} · {{ favorite.house.district }}</p>
+          <div class="house-info">
+            <span>{{ favorite.house.area }}㎡</span>
+            <span>{{ favorite.house.bedroom }}室</span>
+          </div>
+          <div class="house-price">
+            <span class="price">¥{{ favorite.house.price }}</span>
+            <span class="unit">/月</span>
+          </div>
+        </div>
+        <div class="house-actions">
+          <button class="btn btn-outline btn-sm" [routerLink]="['/houses', favorite.house.id]">
+            查看详情
+          </button>
+          <button class="btn btn-light btn-sm" (click)="toggleFavorite(favorite)">
+            取消收藏
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

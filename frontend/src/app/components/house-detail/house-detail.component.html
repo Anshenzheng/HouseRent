@@ -1,0 +1,190 @@
+<div class="house-detail-page" *ngIf="!loading">
+  <div *ngIf="error" class="error-banner">
+    <div class="container">
+      <p>{{ error }}</p>
+      <a routerLink="/houses" class="btn btn-outline btn-sm">返回列表</a>
+    </div>
+  </div>
+
+  <div *ngIf="house && !error" class="container">
+    <div class="breadcrumb">
+      <a routerLink="/">首页</a>
+      <span>/</span>
+      <a routerLink="/houses">找房子</a>
+      <span>/</span>
+      <span>{{ house.title }}</span>
+    </div>
+
+    <div *ngIf="success" class="success-message">{{ success }}</div>
+
+    <div class="house-header">
+      <h1 class="house-title">{{ house.title }}</h1>
+      <div class="house-meta">
+        <span class="location">📍 {{ house.city }} · {{ house.district }} · {{ house.address || '' }}</span>
+        <span class="status badge" [ngClass]="{
+          'badge-success': house.status === 'PUBLISHED',
+          'badge-warning': house.status !== 'PUBLISHED'
+        }">
+          {{ house.status === 'PUBLISHED' ? '可租' : '已下架' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="house-content">
+      <div class="house-main">
+        <div class="image-gallery">
+          <div class="main-image">
+            <img [src]="getHouseImages()[0]" alt="房源图片">
+          </div>
+          <div class="thumbnail-list" *ngIf="getHouseImages().length > 1">
+            <div 
+              *ngFor="let img of getHouseImages().slice(1, 5)" 
+              class="thumbnail">
+              <img [src]="img" alt="房源图片">
+            </div>
+          </div>
+        </div>
+
+        <div class="price-section card">
+          <div class="price-info">
+            <span class="price">¥{{ house.price }}</span>
+            <span class="unit">/月</span>
+          </div>
+          <div class="price-features">
+            <div class="price-feature">
+              <span class="feature-icon">📐</span>
+              <span>{{ house.area }}㎡</span>
+            </div>
+            <div class="price-feature">
+              <span class="feature-icon">🛏️</span>
+              <span>{{ house.bedroom }}室{{ house.livingRoom || 0 }}厅</span>
+            </div>
+            <div class="price-feature">
+              <span class="feature-icon">🌞</span>
+              <span>{{ house.orientation || '朝南' }}</span>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button 
+              class="btn btn-favorite" 
+              [class.active]="isFavorite"
+              (click)="toggleFavorite()">
+              <span class="heart">{{ isFavorite ? '❤️' : '🤍' }}</span>
+              <span>{{ isFavorite ? '已收藏' : '收藏' }}</span>
+            </button>
+            <button 
+              class="btn btn-primary" 
+              (click)="openAppointmentModal()"
+              *ngIf="house.status === 'PUBLISHED'">
+              📅 预约看房
+            </button>
+          </div>
+        </div>
+
+        <div class="info-section card">
+          <h3 class="section-title">房屋信息</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">房屋类型</span>
+              <span class="info-value">{{ house.houseType || '住宅' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">装修情况</span>
+              <span class="info-value">{{ house.decoration || '简装' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">楼层</span>
+              <span class="info-value">{{ house.floor || '中楼层' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">卫生间</span>
+              <span class="info-value">{{ house.bathroom || 1 }}卫</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="description-section card" *ngIf="house.description">
+          <h3 class="section-title">房源描述</h3>
+          <p class="description-text">{{ house.description }}</p>
+        </div>
+
+        <div class="facilities-section card" *ngIf="getFacilities().length > 0">
+          <h3 class="section-title">配套设施</h3>
+          <div class="facilities-grid">
+            <div *ngFor="let facility of getFacilities()" class="facility-item">
+              <span class="facility-icon">✅</span>
+              <span>{{ facility }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="house-sidebar">
+        <div class="landlord-card card">
+          <h3 class="section-title">房东信息</h3>
+          <div class="landlord-info">
+            <div class="landlord-avatar">
+              {{ (house.landlord.realName || house.landlord.username).charAt(0) }}
+            </div>
+            <div class="landlord-details">
+              <p class="landlord-name">{{ house.landlord.realName || house.landlord.username }}</p>
+              <p class="landlord-phone" *ngIf="house.landlord.phone">📞 {{ house.landlord.phone }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showAppointmentModal" (click)="closeAppointmentModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>预约看房</h3>
+        <button class="modal-close" (click)="closeAppointmentModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="error" class="error-message">{{ error }}</div>
+        <div *ngIf="success" class="success-message">{{ success }}</div>
+
+        <form [formGroup]="appointmentForm" (ngSubmit)="submitAppointment()">
+          <div class="form-group">
+            <label class="form-label">看房日期 *</label>
+            <input 
+              type="date" 
+              formControlName="visitDate" 
+              class="form-input"
+              [min]="today">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">看房时间 *</label>
+            <select formControlName="visitTime" class="form-select">
+              <option value="">请选择时间</option>
+              <option *ngFor="let time of timeOptions" [value]="time">{{ time }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">留言（选填）</label>
+            <textarea 
+              formControlName="message" 
+              class="form-textarea"
+              placeholder="请输入您想对房东说的话..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-light" (click)="closeAppointmentModal()">取消</button>
+            <button type="submit" class="btn btn-primary" [disabled]="appointmentLoading">
+              <span *ngIf="!appointmentLoading">确认预约</span>
+              <span *ngIf="appointmentLoading">提交中...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-container" *ngIf="loading">
+  <p>加载中...</p>
+</div>

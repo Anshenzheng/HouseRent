@@ -1,0 +1,112 @@
+<div class="my-appointments-page">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">我的预约</h1>
+      <p class="page-subtitle">查看和管理您的看房预约</p>
+    </div>
+
+    <div *ngIf="success" class="success-message">{{ success }}</div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <div class="tabs">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'tenant'"
+        (click)="switchTab('tenant')">
+        我的预约（租客）
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'landlord'"
+        (click)="switchTab('landlord')">
+        收到的预约（房东）
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <p>加载中...</p>
+    </div>
+
+    <div *ngIf="!loading && appointments.length === 0" class="empty-state">
+      <span class="empty-state-icon">📅</span>
+      <h3>暂无预约记录</h3>
+      <p *ngIf="activeTab === 'tenant'">去浏览房源，预约您感兴趣的房子吧</p>
+      <p *ngIf="activeTab === 'landlord'">您还没有收到租客的预约</p>
+      <a *ngIf="activeTab === 'tenant'" routerLink="/houses" class="btn btn-primary">浏览房源</a>
+    </div>
+
+    <div *ngIf="!loading && appointments.length > 0" class="appointments-list">
+      <div *ngFor="let appointment of appointments" class="appointment-item card">
+        <div class="appointment-header">
+          <span class="status badge {{ getStatusClass(appointment.status) }}">
+            {{ getStatusText(appointment.status) }}
+          </span>
+          <span class="created-time">
+            预约时间：{{ appointment.createdAt | date:'yyyy-MM-dd HH:mm' }}
+          </span>
+        </div>
+
+        <div class="appointment-content">
+          <div class="house-info">
+            <div class="house-image" [routerLink]="['/houses', appointment.house.id]">
+              <img [src]="getHouseImage(appointment)" [alt]="appointment.house.title">
+            </div>
+            <div class="house-details">
+              <h3 class="house-title" [routerLink]="['/houses', appointment.house.id]">
+                {{ appointment.house.title }}
+              </h3>
+              <div class="house-price">
+                <span class="price">¥{{ appointment.house.price }}</span>
+                <span class="unit">/月</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="visit-info">
+            <div class="visit-item">
+              <span class="visit-label">看房日期</span>
+              <span class="visit-value">{{ appointment.visitDate }}</span>
+            </div>
+            <div class="visit-item">
+              <span class="visit-label">看房时间</span>
+              <span class="visit-value">{{ appointment.visitTime }}</span>
+            </div>
+            <div class="visit-item" *ngIf="appointment.message">
+              <span class="visit-label">租客留言</span>
+              <span class="visit-value">{{ appointment.message }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="appointment-actions" *ngIf="activeTab === 'landlord' && appointment.status === 'PENDING'">
+          <button class="btn btn-primary btn-sm" (click)="acceptAppointment(appointment.id)">
+            ✓ 接受
+          </button>
+          <button class="btn btn-light btn-sm btn-danger" (click)="rejectAppointment(appointment.id)">
+            ✕ 拒绝
+          </button>
+        </div>
+
+        <div class="appointment-contact" *ngIf="activeTab === 'tenant'">
+          <div class="contact-info">
+            <span class="contact-label">房东：</span>
+            <span class="contact-name">{{ appointment.landlord.realName || appointment.landlord.username }}</span>
+            <span *ngIf="appointment.landlord.phone" class="contact-phone">
+              📞 {{ appointment.landlord.phone }}
+            </span>
+          </div>
+        </div>
+
+        <div class="appointment-contact" *ngIf="activeTab === 'landlord'">
+          <div class="contact-info">
+            <span class="contact-label">租客：</span>
+            <span class="contact-name">{{ appointment.tenant.realName || appointment.tenant.username }}</span>
+            <span *ngIf="appointment.tenant.phone" class="contact-phone">
+              📞 {{ appointment.tenant.phone }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

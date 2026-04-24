@@ -1,0 +1,38 @@
+<nav class="navbar">
+  <div class="container nav-container">
+    <a routerLink="/" class="logo">
+      <span class="logo-icon">🏠</span>
+      <span class="logo-text">HouseRent</span>
+    </a>
+
+    <button class="mobile-menu-btn" (click)="toggleMobileMenu()">
+      <span *ngIf="!isMobileMenuOpen">☰</span>
+      <span *ngIf="isMobileMenuOpen">✕</span>
+    </button>
+
+    <div class="nav-links" [class.active]="isMobileMenuOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="isMobileMenuOpen = false">首页</a>
+      <a routerLink="/houses" routerLinkActive="active" (click)="isMobileMenuOpen = false">找房子</a>
+
+      <ng-container *ngIf="currentUser">
+        <a *ngIf="currentUser.role === 'LANDLORD'" routerLink="/my-houses" routerLinkActive="active" (click)="isMobileMenuOpen = false">我的房源</a>
+        <a *ngIf="currentUser.role === 'TENANT'" routerLink="/my-appointments" routerLinkActive="active" (click)="isMobileMenuOpen = false">我的预约</a>
+        <a *ngIf="currentUser.role === 'TENANT'" routerLink="/my-favorites" routerLinkActive="active" (click)="isMobileMenuOpen = false">我的收藏</a>
+      </ng-container>
+
+      <div class="nav-auth" *ngIf="!currentUser">
+        <a routerLink="/login" class="nav-link-login" (click)="isMobileMenuOpen = false">登录</a>
+        <a routerLink="/register" class="btn btn-outline btn-sm" (click)="isMobileMenuOpen = false">注册</a>
+      </div>
+
+      <div class="nav-user" *ngIf="currentUser">
+        <span class="user-name">你好, {{ currentUser.realName || currentUser.username }}</span>
+        <span class="user-role badge" [ngClass]="{
+          'badge-success': currentUser.role === 'LANDLORD',
+          'badge-info': currentUser.role === 'TENANT'
+        }">{{ currentUser.role === 'LANDLORD' ? '房东' : '租客' }}</span>
+        <button class="btn btn-outline btn-sm" (click)="logout()">退出</button>
+      </div>
+    </div>
+  </div>
+</nav>

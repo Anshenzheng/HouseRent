@@ -1,0 +1,68 @@
+<div class="my-houses-page">
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">我的房源</h1>
+        <p class="page-subtitle">管理您发布的所有房源</p>
+      </div>
+      <button class="btn btn-primary" routerLink="/my-houses/new">
+        ➕ 发布新房源
+      </button>
+    </div>
+
+    <div *ngIf="success" class="success-message">{{ success }}</div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <div *ngIf="loading" class="loading">
+      <p>加载中...</p>
+    </div>
+
+    <div *ngIf="!loading && houses.length === 0" class="empty-state">
+      <span class="empty-state-icon">🏠</span>
+      <h3>还没有发布房源</h3>
+      <p>点击上方按钮发布您的第一套房源</p>
+      <button class="btn btn-primary" routerLink="/my-houses/new">立即发布</button>
+    </div>
+
+    <div *ngIf="!loading && houses.length > 0" class="houses-list">
+      <div *ngFor="let house of houses" class="house-item card">
+        <div class="house-image" [routerLink]="['/houses', house.id]">
+          <img [src]="getHouseImage(house)" [alt]="house.title">
+          <span class="house-status badge" [ngClass]="{
+            'badge-success': house.status === 'PUBLISHED',
+            'badge-warning': house.status !== 'PUBLISHED'
+          }">
+            {{ getStatusText(house.status) }}
+          </span>
+        </div>
+        <div class="house-info">
+          <h3 class="house-title" [routerLink]="['/houses', house.id]">{{ house.title }}</h3>
+          <p class="house-location">📍 {{ house.city }} · {{ house.district }}</p>
+          <div class="house-details">
+            <span>{{ house.area }}㎡</span>
+            <span>{{ house.bedroom }}室{{ house.livingRoom || 0 }}厅</span>
+            <span>{{ house.decoration || '简装' }}</span>
+          </div>
+          <div class="house-price">
+            <span class="price">¥{{ house.price }}</span>
+            <span class="unit">/月</span>
+          </div>
+        </div>
+        <div class="house-actions">
+          <button 
+            class="btn btn-outline btn-sm"
+            [class.active]="house.status === 'OFFLINE'"
+            (click)="toggleStatus(house)">
+            {{ house.status === 'PUBLISHED' ? '下架' : '上架' }}
+          </button>
+          <button class="btn btn-light btn-sm" [routerLink]="['/my-houses/edit', house.id]">
+            编辑
+          </button>
+          <button class="btn btn-light btn-sm btn-danger" (click)="deleteHouse(house)">
+            删除
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
