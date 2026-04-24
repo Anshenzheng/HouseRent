@@ -19,6 +19,7 @@ export class HouseDetailComponent implements OnInit {
   error = '';
   success = '';
   showAppointmentModal = false;
+  today: string = new Date().toISOString().split('T')[0];
 
   appointmentForm: FormGroup;
   appointmentLoading = false;

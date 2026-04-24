@@ -6,6 +6,7 @@ import com.houserent.dto.JwtResponse;
 import com.houserent.entity.User;
 import com.houserent.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,6 @@ public class AuthController {
         if (user != null) {
             return ResponseEntity.ok(user);
         }
-        return ResponseEntity.unauthorized().build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
