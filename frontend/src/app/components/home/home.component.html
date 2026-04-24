@@ -1,0 +1,102 @@
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">找到您的理想住所</h1>
+    <p class="hero-subtitle">精选优质房源，为您打造温馨的家</p>
+    
+    <div class="search-box">
+      <div class="search-inputs">
+        <div class="search-item">
+          <input 
+            type="text" 
+            [(ngModel)]="searchKeyword" 
+            placeholder="搜索小区、地址..."
+            (keyup.enter)="onSearch()">
+        </div>
+        <div class="search-item">
+          <select [(ngModel)]="searchCity">
+            <option value="">选择城市</option>
+            <option *ngFor="let city of cities.slice(1)" [value]="city">{{ city }}</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" (click)="onSearch()">
+          🔍 搜索
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="container">
+    <h2 class="section-title">为什么选择我们</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🏡</span>
+        <h3>真实房源</h3>
+        <p>所有房源经过严格审核，确保信息真实可靠</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💰</span>
+        <h3>无中介费</h3>
+        <p>房东直租，省去中介费用，租房更划算</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⭐</span>
+        <h3>优质服务</h3>
+        <p>专业客服团队，随时为您解答疑问</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="featured-houses">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">精选房源</h2>
+      <a routerLink="/houses" class="view-all">查看更多 →</a>
+    </div>
+    
+    <div *ngIf="loading" class="loading">
+      <p>加载中...</p>
+    </div>
+    
+    <div *ngIf="!loading && featuredHouses.length === 0" class="empty-state">
+      <p>暂无房源</p>
+    </div>
+    
+    <div *ngIf="!loading && featuredHouses.length > 0" class="houses-grid">
+      <div *ngFor="let house of featuredHouses" class="house-card card">
+        <div class="house-image">
+          <img [src]="getHouseImage(house)" [alt]="house.title">
+          <span class="house-status badge badge-success" *ngIf="house.status === 'PUBLISHED'">可租</span>
+        </div>
+        <div class="house-content">
+          <h3 class="house-title" [routerLink]="['/houses', house.id]">{{ house.title }}</h3>
+          <p class="house-location">📍 {{ house.city }} · {{ house.district }}</p>
+          <div class="house-info">
+            <span>{{ house.area }}㎡</span>
+            <span>{{ house.bedroom }}室{{ house.livingRoom || 0 }}厅</span>
+            <span>{{ house.orientation || '朝南' }}</span>
+          </div>
+          <div class="house-price">
+            <span class="price">¥{{ house.price }}</span>
+            <span class="unit">/月</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2>准备好找到理想的家了吗？</h2>
+      <p>立即注册，开始您的租房之旅</p>
+      <div class="cta-buttons">
+        <a routerLink="/register" class="btn btn-primary">立即注册</a>
+        <a routerLink="/houses" class="btn btn-outline">浏览房源</a>
+      </div>
+    </div>
+  </div>
+</section>

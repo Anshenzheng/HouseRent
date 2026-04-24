@@ -1,0 +1,224 @@
+<div class="house-form-page">
+  <div class="container">
+    <div class="page-header">
+      <button class="back-btn" (click)="goBack()">← 返回</button>
+      <h1 class="page-title">{{ isEdit ? '编辑房源' : '发布新房源' }}</h1>
+    </div>
+
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <div *ngIf="loading" class="loading">
+      <p>加载中...</p>
+    </div>
+
+    <form [formGroup]="houseForm" (ngSubmit)="onSubmit()" class="form-card card" *ngIf="!loading">
+      <div class="form-section">
+        <h2 class="section-title">基本信息</h2>
+
+        <div class="form-group">
+          <label class="form-label">房源标题 *</label>
+          <input 
+            type="text" 
+            formControlName="title" 
+            class="form-input"
+            [class.invalid]="f['title'].touched && f['title'].invalid"
+            placeholder="例如：精装修两居室 近地铁 拎包入住">
+          <div *ngIf="f['title'].touched && f['title'].invalid" class="form-error">
+            <span *ngIf="f['title'].errors?.['required']">请输入房源标题</span>
+            <span *ngIf="f['title'].errors?.['maxlength']">标题最多100个字符</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">房源描述</label>
+          <textarea 
+            formControlName="description" 
+            class="form-textarea"
+            [class.invalid]="f['description'].touched && f['description'].invalid"
+            placeholder="请详细描述房源情况、周边配套等..."></textarea>
+          <div *ngIf="f['description'].touched && f['description'].invalid" class="form-error">
+            描述最多2000个字符
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">位置信息</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">省份/直辖市 *</label>
+            <select 
+              formControlName="province" 
+              class="form-select"
+              [class.invalid]="f['province'].touched && f['province'].invalid"
+              (change)="onProvinceChange()">
+              <option value="">请选择</option>
+              <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+            </select>
+            <div *ngIf="f['province'].touched && f['province'].invalid" class="form-error">
+              请选择省份
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">城市 *</label>
+            <select 
+              formControlName="city" 
+              class="form-select"
+              [class.invalid]="f['city'].touched && f['city'].invalid">
+              <option value="">请选择</option>
+              <option *ngFor="let c of getAvailableCities()" [value]="c">{{ c }}</option>
+            </select>
+            <div *ngIf="f['city'].touched && f['city'].invalid" class="form-error">
+              请选择城市
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">区县 *</label>
+            <select 
+              formControlName="district" 
+              class="form-select"
+              [class.invalid]="f['district'].touched && f['district'].invalid">
+              <option value="">请选择</option>
+              <option *ngFor="let d of districts" [value]="d">{{ d || '请选择' }}</option>
+            </select>
+            <div *ngIf="f['district'].touched && f['district'].invalid" class="form-error">
+              请选择区县
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">详细地址</label>
+          <input 
+            type="text" 
+            formControlName="address" 
+            class="form-input"
+            placeholder="例如：XX小区XX号楼XX单元">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">房屋信息</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">月租金 (元) *</label>
+            <input 
+              type="number" 
+              formControlName="price" 
+              class="form-input"
+              [class.invalid]="f['price'].touched && f['price'].invalid"
+              placeholder="请输入月租金">
+            <div *ngIf="f['price'].touched && f['price'].invalid" class="form-error">
+              <span *ngIf="f['price'].errors?.['required']">请输入租金</span>
+              <span *ngIf="f['price'].errors?.['min']">租金至少100元</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">建筑面积 (㎡) *</label>
+            <input 
+              type="number" 
+              formControlName="area" 
+              class="form-input"
+              [class.invalid]="f['area'].touched && f['area'].invalid"
+              placeholder="请输入面积">
+            <div *ngIf="f['area'].touched && f['area'].invalid" class="form-error">
+              <span *ngIf="f['area'].errors?.['required']">请输入面积</span>
+              <span *ngIf="f['area'].errors?.['min']">面积至少5㎡</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">户型 *</label>
+            <div class="house-type-selector">
+              <input 
+                type="number" 
+                formControlName="bedroom" 
+                class="form-input small"
+                [class.invalid]="f['bedroom'].touched && f['bedroom'].invalid"
+                placeholder="室">
+              <span>室</span>
+              <input 
+                type="number" 
+                formControlName="livingRoom" 
+                class="form-input small"
+                placeholder="厅">
+              <span>厅</span>
+              <input 
+                type="number" 
+                formControlName="bathroom" 
+                class="form-input small"
+                placeholder="卫">
+              <span>卫</span>
+            </div>
+            <div *ngIf="f['bedroom'].touched && f['bedroom'].invalid" class="form-error">
+              请输入卧室数量
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">朝向</label>
+            <select formControlName="orientation" class="form-select">
+              <option *ngFor="let o of orientations" [value]="o">{{ o || '请选择' }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">楼层</label>
+            <select formControlName="floor" class="form-select">
+              <option *ngFor="let f of floors" [value]="f">{{ f || '请选择' }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">装修情况</label>
+            <select formControlName="decoration" class="form-select">
+              <option *ngFor="let d of decorations" [value]="d">{{ d || '请选择' }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">房屋类型</label>
+            <select formControlName="houseType" class="form-select">
+              <option *ngFor="let t of houseTypes" [value]="t">{{ t || '请选择' }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">配套设施</h2>
+        <div class="facilities-grid">
+          <label 
+            *ngFor="let f of facilitiesOptions" 
+            class="facility-item"
+            [class.selected]="isFacilitySelected(f)"
+            (click)="toggleFacility(f)">
+            <span class="check-icon">{{ isFacilitySelected(f) ? '✓' : '' }}</span>
+            <span>{{ f }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">图片信息</h2>
+        <div class="form-group">
+          <label class="form-label">图片链接</label>
+          <input 
+            type="text" 
+            formControlName="images" 
+            class="form-input"
+            placeholder="多张图片用英文逗号分隔">
+          <p class="form-hint">示例: https://example.com/img1.jpg,https://example.com/img2.jpg</p>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" (click)="goBack()">取消</button>
+        <button type="submit" class="btn btn-primary" [disabled]="submitting">
+          <span *ngIf="!submitting">{{ isEdit ? '保存修改' : '发布房源' }}</span>
+          <span *ngIf="submitting">提交中...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
