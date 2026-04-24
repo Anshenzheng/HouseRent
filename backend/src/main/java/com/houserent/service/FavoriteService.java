@@ -33,6 +33,10 @@ public class FavoriteService {
         House house = houseRepository.findById(houseId)
                 .orElseThrow(() -> new RuntimeException("房源不存在"));
 
+        if (house.getLandlord().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("不能收藏自己发布的房源");
+        }
+
         if (favoriteRepository.existsByUserAndHouse(currentUser, house)) {
             favoriteRepository.deleteByUserAndHouse(currentUser, house);
             return null;
